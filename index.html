@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- 引入 echarts.js -->
+    <script src="echarts.js"></script>
+    <link rel="stylesheet" href="css/daterangepicker.css" />
+    <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
+    <script src="js/jquery-1.11.2.min.js"></script>
+    <script src="js/moment.min.js"></script>
+    <script src="js/jquery.daterangepicker.js"></script>
+    <style type="text/css">
+    h3 {
+        color: #4ea5ad;
+    }
+
+    .container {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .content_container {
+        margin: 10px 30px;
+    }
+
+    .container span {
+        width: 120px;
+        display: table-cell;
+    }
+
+    .container select {
+        font-size: 15px;
+    }
+
+    .container input {
+        font-size: 15px;
+        border-radius: 4px;
+        border: 1px solid rgb(166, 166, 166);
+    }
+
+    .canvas_style {
+        width: 600px;
+        height: 400px;
+        float: left;
+        transform: scale(0.8);
+        margin-left: -40px
+    }
+
+    .date_log {
+        padding: 10px;
+        font-weight: bold;
+        border-bottom: 2px solid black;
+    }
+
+    .operate_log {
+        overflow: hidden;
+        padding: 10px;
+        margin: 0 10px;
+        border-bottom: 1px solid black;
+    }
+
+    .operate_after {
+        overflow: hidden;
+        margin: 0 20px;
+    }
+
+    .operate_container span {
+        width: 120px;
+        display: table-cell;
+    }
+
+    .operate_container {
+        padding: 10px 0px;
+    }
+    </style>
+</head>
+
+<body ng-app="myApp" ng-controller="YiMing">
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div style="width:50%;float:left;">
+        <div class="content_container">
+            <div>
+                <h3>
+                统计条件
+            </h3>
+                <div class="container">
+                    <span>
+                基金组合:
+                </span>
+                    <span>
+                 <select>
+                    <option>风险等级1</option>
+                </select>
+            </span>
+                    <span>
+                时间段:
+                </span>
+                    <span>
+                <input id="dom-id" style="width:200px" size="30" value="2013-10-24 to 2017-10-27" readonly="readonly">
+                <!-- <input type="text" ng-change="myFunc()" ng-model="myValue" /> -->
+            </span>
+                </div>
+            </div>
+            <div>
+                <h3>
+                统计数据
+            </h3>
+                <div class="container">
+                    <span>
+                累计收益:
+                </span>
+                    <span ng-bind="fund_data.total_income&&(fund_data.total_income*100).toFixed(2)+'%'">
+                <!-- {{name}} -->
+            </span>
+                    <span>
+                年华波动率:
+                </span>
+                    <span ng-bind="fund_data.year_vola&&(fund_data.year_vola*100).toFixed(2)+'%'">
+               
+            </span>
+                </div>
+                <div class="container">
+                    <span>
+                年华收益:
+                </span>
+                    <span ng-bind="fund_data.year_income&&(fund_data.year_income*100).toFixed(2)+'%'">
+                
+            </span>
+                    <span>
+                夏普比率:
+                </span>
+                    <span ng-bind="fund_data.xp_rate&&(fund_data.xp_rate).toFixed(2)">
+               
+            </span>
+                </div>
+                <div class="container">
+                    <span>
+                最大回撤:
+                </span>
+                    <span ng-bind="fund_data.max_withdraw&&(-fund_data.max_withdraw*100).toFixed(2)+'%'">
+                
+            </span>
+                    <span>
+                收益回撤比:
+                </span>
+                    <span ng-bind="-fund_data.income_withdraw">
+                
+            </span>
+                </div>
+                <div class="container">
+                    <span>
+                净值最高日:
+                </span>
+                    <span ng-bind="fund_data.max_fp_value_date&&fund_data.max_fp_value_date.substring(0,11)">
+               
+            </span>
+                    <span>
+                净值最大值:
+                </span>
+                    <span ng-bind="fund_data.max_fp_value">
+                
+            </span>
+                </div>
+                <div>
+                    <span>
+                最大回撤发生区间:
+                </span>
+                    <span ng-bind="fund_data.max_withdraw_interval">
+                
+            </span>
+                </div>
+            </div>
+            <div id="main2" class="canvas_style"></div>
+            <div id="main" class="canvas_style"></div>
+        </div>
+    </div>
+    <div style="width:48%;float:left;">
+        <div class="content_container">
+            <h3>
+                调仓记录
+            </h3>
+            <div ng-repeat="trade_array_data in trade_array2">
+                <div class="date_log">
+                    {{trade_array_data[0].TradingDay}}
+                </div>
+                <div class="operate_log" ng-repeat="item in trade_array_data">
+                    <div style="float:left">
+                        股票
+                    </div>
+                    <div style="width:100px;float:left;margin-left:20px">
+                        <div>
+                            000616
+                        </div>
+                        <div>
+                            贵州茅台
+                        </div>
+                    </div>
+                    <div style="width:200px;float:left;margin-left:87px">
+                        <div>
+                            28.5%-45.6%
+                        </div>
+                        <div>
+                            申购 18.24%，手续费0%
+                        </div>
+                    </div>
+                </div>
+                <div class="operate_log">
+                    <div style="float:left">
+                        股票
+                    </div>
+                    <div style="width:100px;float:left;margin-left:20px">
+                        <div>
+                            000616
+                        </div>
+                        <div>
+                            贵州茅台
+                        </div>
+                    </div>
+                    <div style="width:200px;float:left;margin-left:87px">
+                        <div>
+                            28.5%-45.6%
+                        </div>
+                        <div>
+                            申购 18.24%，手续费0%
+                        </div>
+                    </div>
+                </div>
+                <div class="operate_after">
+                    <div class="operate_container">
+                        <span>
+                        调仓后净值
+                    </span>
+                        <span>
+                        1.5672
+                    </span>
+                        <span>
+                        不调仓净值
+                    </span>
+                        <span>
+                        1.5672
+                    </span>
+                    </div>
+                    <div class="operate_container">
+                        <span>
+                        调仓前一日净值
+                    </span>
+                        <span>
+                        1.5672
+                    </span>
+                        <span>
+                        手续费净值耗损
+                    </span>
+                        <span>
+                        1.5672
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    angular.module('myApp', []).controller('YiMing', ['$scope', '$http', function($scope, $http) {
+        $http({
+            method: 'GET',
+            url: 'http://fund.tougudashi.com/api/api.php?action=fp-info&fp_id=1'
+        }).then(function successCallback(response) {
+            console.log('response', response.data.data);
+            return response.data.data[0].start_date;
+        }, function errorCallback(response) {
+            console.log('服务器错误', response);
+        }).then(function(start_date) {
+            var now_date = new Date();
+            var now_date_str = now_date.getFullYear() + "-" + (now_date.getMonth() + 1) + "-" + now_date.getDate();
+            moment_change_func(start_date.substring(0, 11), now_date_str)
+        });
+        var moment_change_func = function(start_date, end_date) {
+            $http({
+                type: 'jsonp',
+                method: 'GET',
+                url: 'http://fund.tougudashi.com/api/api.php?action=stat-info&fp_id=1&start_date=' + start_date + '&end_date=' + end_date
+            }).then(function successCallback(response) {
+                $scope.fund_data = response.data.data;
+                console.log('response', response);
+            }, function errorCallback(response) {
+                console.log('服务器错误', response);
+            });
+            $http({
+                method: 'GET',
+                url: 'http://fund.tougudashi.com/api/api.php?action=line1-info&fp_id=1&start_date=' + start_date + '&end_date=' + end_date
+            }).then(function successCallback(response) {
+                var data1 = [],
+                    data2 = [],
+                    data3 = [];
+                response.data.data.forEach(function(item, index) {
+                    data1.push(item.fp_value);
+                    data2.push(Math.abs(item.withdraw * 100));
+                    data3.push(item.TradingDay.substring(0, 11));
+
+                })
+                myChart2.setOption(option_result(data1, data2, data3));
+                console.log('response', response);
+            }, function errorCallback(response) {
+                console.log('服务器错误', response);
+            });
+            $http({
+                method: 'GET',
+                url: 'http://fund.tougudashi.com/api/api.php?action=trade-info&fp_id=1&start_date=' + start_date + '&end_date=' + end_date
+            }).then(function successCallback(response) {
+
+                var trade_array = [];
+                for (var i = 0; i < response.data.data.length; i++) {
+                    if (trade_array[response.data.data[i].TradingDay]) {
+                        trade_array[response.data.data[i].TradingDay].push(response.data.data[i])
+                    } else {
+                        trade_array[response.data.data[i].TradingDay] = [response.data.data[i]];
+                    }
+                }
+
+                $scope.trade_array1 = trade_array;
+
+                var aaa = [];
+                for (var key in trade_array) {
+                    aaa.push(trade_array[key])
+                }
+                console.log('aaa', aaa);
+                $scope.trade_array2 = aaa;
+                // response.data.data.forEach(function(item, index) {
+
+                //     if (trade_array[item.TradingDay]) {
+                //         trade_array[item.TradingDay].push(item)
+                //     } else {
+                //         trade_array[item.TradingDay] = [item]
+                //     }
+                //     if(index==(response.data.data.length-1)){
+                //         $scope.trade_array = trade_array;
+                //     }
+                // })
+                // $scope.$digest();
+                console.log('$scope.trade_array', $scope.trade_array);
+            }, function errorCallback(response) {
+                console.log('服务器错误', response);
+            });
+        }
+        var configObject = {
+            format: 'YYYY-MM-DD',
+            separator: ' to ',
+            language: 'auto',
+            startOfWeek: 'sunday', // or monday
+            getValue: function() {
+                return this.value;
+            },
+            setValue: function(s) {
+                this.value = s;
+            },
+            startDate: false,
+            endDate: false,
+            minDays: 0,
+            maxDays: 0,
+            changeYear: true,
+            showShortcuts: true,
+            time: {
+                enabled: false
+            },
+            shortcuts: {
+                //'prev-days': [1,3,5,7],
+                'next-days': [3, 5, 7],
+                //'prev' : ['week','month','year'],
+                'next': ['week', 'month', 'year']
+            },
+            customShortcuts: [],
+            inline: false,
+            container: 'body',
+            alwaysOpen: false,
+            singleDate: false,
+            batchMode: false,
+            beforeShowDay: false,
+            dayDivAttrs: [],
+            dayTdAttrs: [],
+            applyBtnClass: ''
+        };
+        $('#dom-id').dateRangePicker(configObject)
+            .bind('datepicker-apply', function(event, obj) {
+                // console.log(1,2,3,obj,obj.value.split(' '));
+                moment_change_func(obj.value.split(' ')[0], obj.value.split(' ')[2]);
+            });
+        // $("#dom-id").on('apply.daterangepicker',function(){console.log('success')});
+        $scope.myFunc = function() {
+            console.log('success');
+        }
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+        // 指定图表的配置项和数据
+        var dataarray0 = ['08-01', '08-02', '08-03', '08-04', '08-05', '08-06', '08-07'];
+        var dataarray1 = [1.9, 1.5, 2.1, 1.6, 1.8, 1.6, 1.5];
+        var dataarray2 = [0.4, 0.2, 0.4, 0.3, 0.3, 0.5, 0.3];
+        var dataarray3 = [0.1, 0.3, 0.3, 0.5, 0.4, 0.4, 0.4];
+        var dataarray4 = [0.4, 0.1, 0.5, 0.1, 0.5, 0.2, 0.2];
+        var dataarray5 = [0.3, 0.5, 0.6, 0.3, 0.2, 0.3, 0.4];
+        var dataarray6 = [0.7, 0.4, 0.3, 0.4, 0.4, 0.2, 0.2];
+
+        function option2_result(data0, data1, data2, data3, data4, data5, data6) {
+            return {
+                title: {
+                    text: '净值',
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        label: {
+                            backgroundColor: '#6a7985'
+                        }
+                    }
+                },
+                legend: {
+                    data: ['基金代码1', '基金代码2', '基金代码3', '基金代码4', '基金代码5']
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [{
+                    type: 'category',
+                    boundaryGap: false,
+                    data: data0
+                }],
+                yAxis: [{
+                    type: 'value'
+                }],
+                series: [{
+                        name: '基金代码1',
+                        type: 'line',
+                        stack: '总量',
+                        areaStyle: { normal: {} },
+                        data: data2
+                    },
+                    {
+                        name: '基金代码2',
+                        type: 'line',
+                        stack: '总量',
+                        areaStyle: { normal: {} },
+                        data: data3
+                    },
+                    {
+                        name: '基金代码3',
+                        type: 'line',
+                        stack: '总量',
+                        areaStyle: { normal: {} },
+                        data: data4
+                    },
+                    {
+                        name: '基金代码4',
+                        type: 'line',
+                        stack: '总量',
+                        areaStyle: { normal: {} },
+                        data: data5
+                    },
+                    {
+                        name: '基金代码5',
+                        type: 'line',
+                        stack: '总量',
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'top',
+                                formatter: function(value, indicator) {
+
+                                    return data1[value.dataIndex];
+                                }
+                            }
+                        },
+                        areaStyle: { normal: {} },
+                        data: data6
+                    }
+                ]
+            };
+        }
+
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option2_result(dataarray0, dataarray1, dataarray2, dataarray3, dataarray4, dataarray5, dataarray6));
+
+
+
+        var myChart2 = echarts.init(document.getElementById('main2'));
+        var option2_data1 = [
+            1.3, 1.6, 0.9, 0.3, 1.6
+        ];
+        var option2_data2 = [
+            1.3, 1.6, 0.9, 0.3, 1.6
+        ];
+        var option2_data3 = [
+            '08-01', '08-02', '08-03', '08-04', '08-05',
+        ];
+        var option2_data4 = 40;
+
+        function option_result(data1, data2, data3, data4) {
+            return {
+                title: {
+                    text: '净值最大回撤关系图',
+                    subtext: '数据华创上海研究所',
+                    x: 'center',
+                    align: 'right'
+                },
+                grid: {
+                    bottom: '7%'
+                },
+                toolbox: {
+                    feature: {
+
+                        saveAsImage: {}
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        animation: false,
+                        label: {
+                            backgroundColor: '#505765'
+                        }
+                    },
+                    formatter: function(params) {
+                        var res = "";
+                        res = params[0].name;
+                        console.log(params[0].value);
+                        res += '<br/>' + params[0].seriesName + ' : ' + params[0].value + '<br/>' + params[1].seriesName + ' : ' + params[1].value + "%"
+                        // for (var i = 0, l = params.length; i < l; i++) {
+                        //     res += '<br/>' + params[i].seriesName + ' : ' + params[i].value + "%";
+                        // }
+                        return res;
+                    },
+                },
+                legend: {
+                    data: ['基金净值', '回撤'],
+                    x: 'left'
+                },
+                // dataZoom: [{
+                //         show: true,
+                //         realtime: true,
+                //         start: 65,
+                //         end: 85
+                //     },
+                //     {
+                //         type: 'inside',
+                //         realtime: true,
+                //         start: 65,
+                //         end: 85
+                //     }
+                // ],
+                xAxis: [{
+                    type: 'category',
+                    boundaryGap: false,
+                    // axisLine: { onZero: false },
+                    data: data3,
+                }],
+                yAxis: [{
+                        name: '基金净值',
+                        type: 'value',
+                        
+                    },
+                    {
+                        name: '回撤',
+                        nameLocation: 'start',
+                        start: 0,
+                        type: 'value',
+                        max: data4,
+                        inverse: true,
+                        axisLabel: {
+                            show: true,
+                            interval: 'auto',
+                            formatter: '{value}% '
+                        }
+                    },
+
+                ],
+                series: [{
+                        name: '基金净值',
+                        type: 'line',
+                        animation: false,
+
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        // markArea: {
+                        //     silent: true,
+                        //     data: [
+                        //         [{
+                        //             xAxis: '2009/9/12\n7:00'
+                        //         }, {
+                        //             xAxis: '2009/9/22\n7:00'
+                        //         }]
+                        //     ]
+                        // },
+                        data: data1
+                    },
+                    {
+                        name: '回撤',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        animation: false,
+                        areaStyle: {
+                            normal: {
+                                color: '#92d050'
+                            }
+                        },
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        axisLabel: {
+                            show: true,
+                            interval: 'auto',
+                            formatter: '{value}% '
+                        },
+                        // markArea: {
+                        //     silent: true,
+                        //     data: [
+                        //         [{
+                        //             xAxis: '2009/9/10\n7:00'
+                        //         }, {
+                        //             xAxis: '2009/9/20\n7:00'
+                        //         }]
+                        //     ]
+                        // },
+                        data: data2
+                    }
+                ]
+            }
+        }
+        myChart2.setOption(option_result(option2_data1, option2_data2, option2_data3, option2_data4));
+    }]);
+    </script>
+</body>
+
+</html>
