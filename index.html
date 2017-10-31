@@ -264,7 +264,7 @@
     angular.module('myApp', []).controller('YiMing', ['$scope', '$http', function($scope, $http) {
         $http({
             method: 'GET',
-            url: 'http://fund.tougudashi.com/api/api.php?action=fp-info&fp_id=1'
+            url: '//fund.tougudashi.com/api/api.php?action=fp-info&fp_id=1'
         }).then(function successCallback(response) {
             console.log('response', response.data.data);
             return response.data.data[0].start_date;
@@ -279,7 +279,7 @@
             $http({
                 type: 'jsonp',
                 method: 'GET',
-                url: 'http://fund.tougudashi.com/api/api.php?action=stat-info&fp_id=1&start_date=' + start_date + '&end_date=' + end_date
+                url: '//fund.tougudashi.com/api/api.php?action=stat-info&fp_id=1&start_date=' + start_date + '&end_date=' + end_date
             }).then(function successCallback(response) {
                 $scope.fund_data = response.data.data;
                 console.log('response', response);
@@ -288,7 +288,7 @@
             });
             $http({
                 method: 'GET',
-                url: 'http://fund.tougudashi.com/api/api.php?action=line1-info&fp_id=1&start_date=' + start_date + '&end_date=' + end_date
+                url: '//fund.tougudashi.com/api/api.php?action=line1-info&fp_id=1&start_date=' + start_date + '&end_date=' + end_date
             }).then(function successCallback(response) {
                 var data1 = [],
                     data2 = [],
@@ -306,7 +306,7 @@
             });
             $http({
                 method: 'GET',
-                url: 'http://fund.tougudashi.com/api/api.php?action=trade-info&fp_id=1&start_date=' + start_date + '&end_date=' + end_date
+                url: '//fund.tougudashi.com/api/api.php?action=trade-info&fp_id=1&start_date=' + start_date + '&end_date=' + end_date
             }).then(function successCallback(response) {
 
                 var trade_array = [];
